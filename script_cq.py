@@ -4,19 +4,16 @@ import time
 import warnings
 import os
 
-# Ignore pandas warnings about type compatibility
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 
 INPUT_FILE = "database_questionari_inglese.xlsx"
 OUTPUT_FILE = "questionari_con_risposte.xlsx"
-# OLLAMA_MODEL = "llama3:latest" # "llama3.1:latest"
 OLLAMA_MODEL = "gemma3:12b"
-# OLLAMA_MODEL = "gemma3:latest" # "gemma3:4b"
 OLLAMA_URL = "http://localhost:11434/api/generate"
-AUTOSAVE_INTERVAL = 10
-MOTIVAZIONE_INTERVAL = 10  # Ogni 20 righe aggiungi anche la motivazione per test a campione
-# Skip temporaneo della motivazione per velocizzare
+AUTOSAVE_INTERVAL = 50
+MOTIVAZIONE_INTERVAL = 100
+
 PROMPT_TEMPLATE = """
 {prompt}
 

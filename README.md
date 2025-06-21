@@ -7,7 +7,7 @@ Questo script automatizza la compilazione di questionari utilizzando Ollama, un 
 ## Requisiti
 
 - Python 3.x
-- Ollama installato e in esecuzione localmente con il modello `llama3`
+- Ollama installato e in esecuzione localmente con il modello scelto nel py
 - Un file Excel di input con domande nel formato corretto
 
 ## Dipendenze Python
@@ -37,7 +37,7 @@ Il script utilizza le seguenti impostazioni configurabili all'inizio del file:
 ```python
 INPUT_FILE = "database_questionari_inglese.xlsx"  # Nome del file Excel di input
 OUTPUT_FILE = "questionari_con_risposte.xlsx"     # Nome del file Excel di output
-OLLAMA_MODEL = "llama3"                           # Modello Ollama da utilizzare
+OLLAMA_MODEL = "llama3" # esempio                           # Modello Ollama da utilizzare
 OLLAMA_URL = "http://localhost:11434/api/generate" # URL API di Ollama
 AUTOSAVE_INTERVAL = 10                            # Frequenza di salvataggio automatico
 ```

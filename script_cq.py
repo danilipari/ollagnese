@@ -12,9 +12,9 @@ INPUT_FILE = "database_questionari_inglese.xlsx"
 OUTPUT_FILE = "questionari_con_risposte.xlsx"
 # OLLAMA_MODEL = "llama3:latest" # "llama3.1:latest"
 # OLLAMA_MODEL = "gemma3:12b"
-OLLAMA_MODEL = "chevalblanc/gpt-4o-mini:latest"
+OLLAMA_MODEL = "gemma3:latest" # "gemma3:4b"
 OLLAMA_URL = "http://localhost:11434/api/generate"
-AUTOSAVE_INTERVAL = 10
+AUTOSAVE_INTERVAL = 5
 PROMPT_TEMPLATE = """
 {prompt}
 

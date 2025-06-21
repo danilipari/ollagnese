@@ -4,25 +4,27 @@ import time
 import warnings
 import os
 
-# Ignora i warning di pandas sulla compatibilità dei tipi
+# Ignore pandas warnings about type compatibility
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 
 INPUT_FILE = "database_questionari_inglese.xlsx"
 OUTPUT_FILE = "questionari_con_risposte.xlsx"
-OLLAMA_MODEL = "llama3:latest" # "llama3.1:latest"
+# OLLAMA_MODEL = "llama3:latest" # "llama3.1:latest"
+# OLLAMA_MODEL = "gemma3:12b"
+OLLAMA_MODEL = "chevalblanc/gpt-4o-mini:latest"
 OLLAMA_URL = "http://localhost:11434/api/generate"
 AUTOSAVE_INTERVAL = 10
 PROMPT_TEMPLATE = """
 {prompt}
 
-Rispondi nel formato seguente:
-Risposta: [inserisci un numero]
-Motivazione: [inserisci la tua spiegazione]
+Please respond in the following format:
+Answer: [insert a number]
+Reasoning: [insert your explanation]
 """
 
 def interroga_ollama(prompt):
-    # Formatta il prompt per ottenere risposte strutturate
+    # Format the prompt to get structured responses
     prompt_formattato = PROMPT_TEMPLATE.format(prompt=prompt.strip())
     
     payload = {
@@ -45,36 +47,36 @@ def interroga_ollama(prompt):
         
         for line in lines:
             line = line.strip()
-            if line.lower().startswith("risposta:"):
+            if line.lower().startswith("answer:"):
                 numero = line.split(":", 1)[-1].strip()
-            elif "motivazione:" in line.lower():
+            elif "reasoning:" in line.lower():
                 parsing_motivazione = True
-                parts = line.lower().split("motivazione:", 1)
+                parts = line.lower().split("reasoning:", 1)
                 if len(parts) > 1 and parts[1].strip():
                     motivazione_list.append(parts[1].strip())
                 continue
-            elif parsing_motivazione and line:  # Ignora linee vuote
+            elif parsing_motivazione and line:  # Skip empty lines
                 motivazione_list.append(line)
         
         motivazione = " ".join(motivazione_list).strip()
         
-        if not motivazione and "motivazione:" in testo.lower():
-            parts = testo.lower().split("motivazione:", 1)
+        if not motivazione and "reasoning:" in testo.lower():
+            parts = testo.lower().split("reasoning:", 1)
             if len(parts) > 1:
                 motivazione = parts[1].strip()
         
         if not motivazione and numero:
-            parts = testo.lower().split("risposta:", 1)
+            parts = testo.lower().split("answer:", 1)
             if len(parts) > 1:
-                text_after_risposta = parts[1]
-                if numero in text_after_risposta:
-                    text_after_risposta = text_after_risposta.replace(numero, "", 1)
-                motivazione = text_after_risposta.strip()
+                text_after_answer = parts[1]
+                if numero in text_after_answer:
+                    text_after_answer = text_after_answer.replace(numero, "", 1)
+                motivazione = text_after_answer.strip()
         
         return numero, motivazione
 
     except Exception as e:
-        print(f"[ERRORE] Chiamata a Ollama fallita:\n{e}")
+        print(f"[ERROR] Ollama call failed:\n{e}")
         return "", ""
 
 
@@ -84,11 +86,11 @@ df["Risposta numerica"] = df["Risposta numerica"].astype('object') if "Risposta 
 df["Motivazione"] = df["Motivazione"].astype('object') if "Motivazione" in df.columns else pd.Series(dtype='object')
 
 if os.path.exists(OUTPUT_FILE):
-    print(f"File di output {OUTPUT_FILE} trovato. Verifica se ci sono risposte già elaborate...")
+    print(f"Output file {OUTPUT_FILE} found. Checking if there are already processed responses...")
     try:
         risposte_esistenti = pd.read_excel(OUTPUT_FILE)
         risposte_df = risposte_esistenti.copy()
-        print(f"Caricate {len(risposte_df)} risposte già elaborate.")
+        print(f"Loaded {len(risposte_df)} already processed responses.")
         
         for idx, row in risposte_df.iterrows():
             mask = df["Prompt"] == row["Prompt"]
@@ -98,12 +100,12 @@ if os.path.exists(OUTPUT_FILE):
                 df.loc[i, "Motivazione"] = row["Motivazione"]
         
     except Exception as e:
-        print(f"Errore nel caricamento del file esistente: {e}")
+        print(f"Error loading existing file: {e}")
         risposte_df = pd.DataFrame(columns=df.columns)
-        print("Creato DataFrame vuoto per le risposte")
+        print("Created empty DataFrame for responses")
 else:
     risposte_df = pd.DataFrame(columns=df.columns)
-    print("Creato DataFrame vuoto per le risposte")
+    print("Created empty DataFrame for responses")
 
 try:
     for i, row in df.iterrows():
@@ -112,10 +114,10 @@ try:
 
         prompt = str(row["Prompt"])
         if not prompt.strip():
-            print(f"[{i}] Prompt vuoto, salto.")
+            print(f"[{i}] Empty prompt, skipping.")
             continue
 
-        print(f"[{i}] Invio prompt a Ollama...")
+        print(f"[{i}] Sending prompt to Ollama...")
 
         numero, motivazione = interroga_ollama(prompt)
         update_df = pd.DataFrame({
@@ -135,41 +137,41 @@ try:
         nuova_riga["Motivazione"] = motivazione
         
         risposte_df.loc[len(risposte_df)] = nuova_riga
-        print(f"[LOG] Aggiunta riga al DataFrame delle risposte (totale: {len(risposte_df)})")
+        print(f"[LOG] Added row to responses DataFrame (total: {len(risposte_df)})")
 
         if i % AUTOSAVE_INTERVAL == 0 and i > 0:
             if len(risposte_df) > 0:
                 risposte_df.to_excel(OUTPUT_FILE, index=False)
-                print(f"[AUTO-SAVE] File salvato a riga {i} con {len(risposte_df)} risposte elaborate")
+                print(f"[AUTO-SAVE] File saved at row {i} with {len(risposte_df)} processed responses")
             else:
-                print("[WARNING] Dataframe delle risposte vuoto, nessun salvataggio effettuato")
+                print("[WARNING] Responses DataFrame is empty, no save performed")
 
         time.sleep(1)
 
 except KeyboardInterrupt:
-    print("\n\n[INTERRUZIONE] Script interrotto dall'utente. Salvataggio dati...")
+    print("\n\n[INTERRUPTION] Script interrupted by user. Saving data...")
     if len(risposte_df) > 0:
         risposte_df.to_excel(OUTPUT_FILE, index=False)
-        print(f"✅ File salvato come: {OUTPUT_FILE} con {len(risposte_df)} risposte")
+        print(f"✅ File saved as: {OUTPUT_FILE} with {len(risposte_df)} responses")
     else:
-        print("❌ Nessuna risposta da salvare")
+        print("❌ No responses to save")
     exit(0)
 except Exception as e:
-    print(f"\n\n[ERRORE] Si è verificato un errore: {e}")
-    print("Tentativo di salvataggio dati...")
+    print(f"\n\n[ERROR] An error occurred: {e}")
+    print("Attempting to save data...")
     try:
         if len(risposte_df) > 0:
             risposte_df.to_excel(OUTPUT_FILE, index=False)
-            print(f"✅ File salvato come: {OUTPUT_FILE} con {len(risposte_df)} risposte")
+            print(f"✅ File saved as: {OUTPUT_FILE} with {len(risposte_df)} responses")
         else:
-            print("❌ Nessuna risposta da salvare")
+            print("❌ No responses to save")
     except Exception as save_error:
-        print(f"❌ Impossibile salvare il file: {save_error}")
+        print(f"❌ Unable to save file: {save_error}")
     exit(1)
 
-# === SALVATAGGIO FINALE ===
+# === FINAL SAVE ===
 if len(risposte_df) > 0:
     risposte_df.to_excel(OUTPUT_FILE, index=False)
-    print(f"✅ File finale salvato come: {OUTPUT_FILE} con {len(risposte_df)} risposte")
+    print(f"✅ Final file saved as: {OUTPUT_FILE} with {len(risposte_df)} responses")
 else:
-    print("❌ Nessuna risposta da salvare")
+    print("❌ No responses to save")

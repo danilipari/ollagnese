@@ -30,7 +30,6 @@ Reasoning: [insert your explanation]
 """
 
 def interroga_ollama(prompt, richiedi_motivazione=False):
-    # Scegli il template in base alla richiesta
     template = PROMPT_TEMPLATE_WITH_REASONING if richiedi_motivazione else PROMPT_TEMPLATE
     prompt_formattato = template.format(prompt=prompt.strip())
     
@@ -51,7 +50,6 @@ def interroga_ollama(prompt, richiedi_motivazione=False):
         lines = testo.splitlines()
         
         if richiedi_motivazione:
-            # Parsing completo per numero e motivazione
             parsing_motivazione = False
             motivazione_list = []
             
@@ -86,7 +84,7 @@ def interroga_ollama(prompt, richiedi_motivazione=False):
                     numero = line
                     break
         
-        # Estrazione numero con regex se necessario
+        # Estrazione numero con regex
         if not numero:
             import re
             numeri = re.findall(r'\d+', testo)

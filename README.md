@@ -39,7 +39,8 @@ INPUT_FILE = "database_questionari_inglese.xlsx"  # Nome del file Excel di input
 OUTPUT_FILE = "questionari_con_risposte.xlsx"     # Nome del file Excel di output
 OLLAMA_MODEL = "llama3" # esempio                           # Modello Ollama da utilizzare
 OLLAMA_URL = "http://localhost:11434/api/generate" # URL API di Ollama
-AUTOSAVE_INTERVAL = 10                            # Frequenza di salvataggio automatico
+AUTOSAVE_INTERVAL = 50                            # Frequenza di salvataggio automatico
+MOTIVAZIONE_INTERVAL = 100                        # Frequenza generazione motivazione nell'excel
 ```
 
 ## Formato del File di Input

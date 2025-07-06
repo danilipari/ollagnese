@@ -49,7 +49,8 @@ def main():
     output_file = "matrici_adiacenza_retiFR.xlsx"
 
     # ─── 2. Carica e pulisci i dati ───────────────────────────────
-    df = pd.read_excel(input_file, sheet_name="Sheet1")
+    # df = pd.read_excel(input_file, sheet_name="Sheet1")
+    df = pd.read_excel(input_file, sheet_name="Risposte FR matrici")
 
     df = df.rename(columns={
         "Cod profilo rispondente": "from",

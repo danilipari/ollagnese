@@ -7,12 +7,16 @@ import os
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 
-INPUT_FILE = "database_questionari_inglese.xlsx"
-OUTPUT_FILE = "questionari_con_risposte.xlsx"
+# INPUT_FILE = "database_questionari_inglese.xlsx"
+# OUTPUT_FILE = "questionari_con_risposte.xlsx"
+INPUT_FILE = "database_questionariFR.xlsx"
+OUTPUT_FILE = "questionari_con_risposteFR.xlsx"
 OLLAMA_MODEL = "gemma3:12b"
 OLLAMA_URL = "http://localhost:11434/api/generate"
-AUTOSAVE_INTERVAL = 50
-MOTIVAZIONE_INTERVAL = 100
+# AUTOSAVE_INTERVAL = 50
+# MOTIVAZIONE_INTERVAL = 100
+AUTOSAVE_INTERVAL = 25
+MOTIVAZIONE_INTERVAL = 50
 
 PROMPT_TEMPLATE = """
 {prompt}

@@ -43,8 +43,10 @@ def crea_matrici(df, domande, nodes, is_binaria=False, soglia=2.5):
 
 def main():
     # ─── 1. Impostazioni ───────────────────────────────────────────
-    input_file  = "questionari_con_risposte_matrici.xlsx"
-    output_file = "matrici_adiacenza_reti.xlsx"
+    # input_file  = "questionari_con_risposte_matrici.xlsx"
+    # output_file = "matrici_adiacenza_reti.xlsx"
+    input_file  = "questionari_con_risposte_matriciFR.xlsx"
+    output_file = "matrici_adiacenza_retiFR.xlsx"
 
     # ─── 2. Carica e pulisci i dati ───────────────────────────────
     df = pd.read_excel(input_file, sheet_name="Sheet1")
